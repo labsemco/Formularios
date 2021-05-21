@@ -77,7 +77,7 @@ function ListarHCGoogle(carpetaId){
 
 function crearFormulario(idSheet) {
 
-  var sheet = SpreadsheetApp.openById(idSheet).getSheetByName('Hoja1');
+  var sheet = SpreadsheetApp.openById(idSheet).getSheetByName('datosForm');
   var lastRow = sheet.getLastRow(); //Obtiene la última fila
   var lastCol = sheet.getLastColumn(); //Obtiene la última columna
 
@@ -89,7 +89,10 @@ function crearFormulario(idSheet) {
        .setTitle(tituloForm);  
 
 
-  data.forEach(function(item){ //Recorrer todas las filas
+
+  try{
+
+    data.forEach(function(item){ //Recorrer todas las filas
       item.forEach(function(elemento){  //Recorrer cada elemento del arreglo de las filas
     
         switch(elemento){
@@ -104,6 +107,72 @@ function crearFormulario(idSheet) {
                 .setRequired(requerido);
                 break;
 
+            case 'FECHA':
+                var requerido= true;
+
+                if(item[2]=='NO'){
+                  requerido = false;
+                }
+                form.addDateItem()   
+                .setTitle(item[0])
+                .setRequired(requerido);
+                break;
+
+            case 'TIEMPO':
+                var requerido= true;
+
+                if(item[2]=='NO'){
+                  requerido = false;
+                }
+                form.addDurationItem()  
+                .setTitle(item[0])
+                .setRequired(requerido);
+                break; 
+
+              case 'SECUENCIA':
+                var requerido= true;
+                var opciones = item.slice(3,lastCol); //Obtiene todas las respuestas para la pregunta
+                var filtrado = opciones.filter(function(element) { return element != ''}) //Elimina celdas vacias
+                if(item[2]=='NO'){
+                  requerido = false;
+                }
+                var inicio = parseInt(filtrado[0])  
+                var final = parseInt(filtrado[1])
+                form.addScaleItem()  
+                  .setTitle(item[0])
+                  .setBounds(inicio,final)
+                  .setRequired(requerido)
+                
+                break;  
+
+
+
+              case 'PARRAFO':
+                var requerido= true;
+
+                if(item[2]=='NO'){
+                  requerido = false;
+                }
+                form.addParagraphTextItem()  
+                .setTitle(item[0])
+                .setRequired(requerido);
+                break; 
+
+
+
+              case 'FECHA/TIEMPO':
+                var requerido= true;
+                  if(item[2]=='NO'){
+                    requerido = false;
+                }
+                  form.addDateTimeItem()
+                    .setTitle(item[0])
+                      .setRequired(requerido);
+                        break;  
+
+
+                
+
             case 'MULTIPLE':
                 var requerido= true;
                 var opciones = item.slice(3,lastCol); //Obtiene todas las respuestas para la pregunta
@@ -115,7 +184,8 @@ function crearFormulario(idSheet) {
                 .setTitle(item[0])
                 .setChoiceValues(filtrado)
                 .setRequired(requerido);
-                break;        
+                break;
+         
             case 'CHECKBOX':
                 var requerido= true;
                 var opciones = item.slice(3,lastCol) //Obtiene todas las respuestas para la pregunta
@@ -164,10 +234,19 @@ function crearFormulario(idSheet) {
 
     //var url = form.getPublishedUrl();
     var url = form.getEditUrl();
-  
-
 
     return url;
+
+
+
+  }catch(f){
+
+    return 'Error al crear, verifique correctamente el formato';
+
+  }
+
+
+  
 }
 
 
